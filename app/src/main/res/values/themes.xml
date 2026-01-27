@@ -8,6 +8,7 @@
 
     <style name="Theme.SafeBankSplashScreen"
         parent="Theme.SplashScreen">
+        <item name="android:windowNoTitle">true</item>
         <item name="windowSplashScreenBackground">@color/black</item>
         <item name="postSplashScreenTheme">@style/Theme.SafeBank</item>
     </style>
