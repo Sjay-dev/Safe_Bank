@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.SafeBank" parent="android:Theme.Material.Light.NoActionBar" />
-
-    <style name="Theme.SafeBankSplashScreen" parent="Theme.SplashScreen">
-
-        <item name="android:windowSplashScreenBackground" tools:targetApi="31"></item>
+    <style name="Theme.SafeBank"
+        parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
     </style>
+
+    <style name="Theme.SafeBankSplashScreen"
+        parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/black</item>
+        <item name="postSplashScreenTheme">@style/Theme.SafeBank</item>
+    </style>
+
 
 </resources>

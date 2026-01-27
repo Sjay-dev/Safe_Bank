@@ -4,6 +4,6 @@
     <style name="Theme.SafeBankSplashScreen" parent="Theme.SplashScreen">
         <item name="windowSplashScreenAnimatedIcon">@drawable/logo</item>
         <item name="android:windowSplashScreenBackground">@color/primaryBlue</item>
-        <item name="postSplashScreenTheme">@style/Theme.SafeBankSplashScreen</item>
+        <item name="postSplashScreenTheme">@style/Theme.SafeBank</item>
     </style>
 </resources>
