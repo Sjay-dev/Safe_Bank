@@ -21,7 +21,9 @@ fun DashBoard(){
                     .statusBarsPadding(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                GreetingBar("Sj")
 
+                BalanceCard("$500" , "Bonus + Cash")
             }
     }
 }
