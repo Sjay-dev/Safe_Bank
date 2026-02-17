@@ -25,6 +25,7 @@ fun RecentTransactionsSection() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .weight(1f)
                 .padding(16.dp)
         ) {
 

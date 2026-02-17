@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.safebank.View.Auth.SignUpScreen
 import com.example.safebank.View.DashBoard.DashBoard
+import com.example.safebank.View.DashBoard.ScaffoldScreen
 import com.example.safebank.ui.theme.SafeBankTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,7 +22,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SafeBankTheme {
-                DashBoard()
+                ScaffoldScreen()
             }
             }
         }
