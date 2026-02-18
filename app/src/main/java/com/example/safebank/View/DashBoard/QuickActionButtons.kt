@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -29,17 +30,17 @@ fun QuickActionsRow() {
     ) {
         QuickActionItem(
             icon = Icons.Default.Send,
-            label = "Transfer"
+            label = "Transfer to SafeBank"
         )
 
         QuickActionItem(
             icon = Icons.Default.Receipt,
-            label = "Pay Bills"
+            label = "Transfer to Other Banks"
         )
 
         QuickActionItem(
             icon = Icons.Default.PhoneAndroid,
-            label = "Airtime"
+            label = "Pay Bills"
         )
     }
 }
@@ -52,48 +53,51 @@ fun QuickActionItem(
 ) {
     Card(
         modifier = Modifier
-            .width(100.dp)
-            .height(90.dp),
+            .width(120.dp)
+            .height(110.dp),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        )
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            contentAlignment = Alignment.Center
         ) {
-
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .background(
-                        color = Color(0xFFEAF2FF),
-                        shape = CircleShape
-                    ),
-                contentAlignment = Alignment.Center
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = label,
-                    tint = Color(0xFF2563EB),
-                    modifier = Modifier.size(20.dp)
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .background(
+                            color = Color(0xFFEAF2FF),
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = label,
+                        tint = Color(0xFF2563EB),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = label,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = label,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.Black
-            )
         }
     }
 }
+
 
