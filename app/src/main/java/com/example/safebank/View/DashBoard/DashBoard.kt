@@ -23,7 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.safebank.Navigation.BottomScreen
-import com.example.safebank.View.Settings.TestScreen
+import com.example.safebank.View.Settings.SettingsScreen
 
 
 @Composable
@@ -45,7 +45,7 @@ fun ScaffoldScreen(){
             }
 
             composable(BottomScreen.Settings.route) {
-                TestScreen()
+                SettingsScreen()
             }
         }
     }
@@ -55,9 +55,7 @@ fun ScaffoldScreen(){
 fun DashBoard(){
 
     Surface(
-        modifier = Modifier.fillMaxSize()
-            .statusBarsPadding()
-        ,
+        modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
 
