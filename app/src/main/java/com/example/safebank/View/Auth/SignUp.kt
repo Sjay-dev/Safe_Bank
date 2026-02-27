@@ -35,12 +35,14 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.example.safebank.Navigation.Screen
 import com.example.safebank.R
 
 
 @Composable
 fun SignUpScreen(
-//    navController: NavHostController
+    navController: NavHostController
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -97,6 +99,8 @@ fun SignUpScreen(
             Button(
                 onClick = {
                     // TODO: Handle sign up logic
+
+                    navController.navigate(Screen.Login.route)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -155,18 +159,10 @@ fun SignUpScreen(
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.clickable {
-//                        navController.navigate("login")
+                        navController.navigate(Screen.Login.route)
                     }
                 )
             }
         }
     }
-}
-
-
-@Composable
-@Preview
-fun previewSignUpScreen(){
-    SignUpScreen(
-    )
 }

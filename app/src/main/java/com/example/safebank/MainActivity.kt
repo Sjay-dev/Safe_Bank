@@ -11,6 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.example.safebank.Navigation.AppNavHost
+import com.example.safebank.View.Auth.LoginScreen
 import com.example.safebank.View.Auth.SignUpScreen
 import com.example.safebank.View.DashBoard.DashBoard
 import com.example.safebank.View.DashBoard.ScaffoldScreen
@@ -21,8 +24,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+
+            val navController = rememberNavController()
+
             SafeBankTheme {
-                ScaffoldScreen()
+                AppNavHost(navController)
             }
             }
         }
