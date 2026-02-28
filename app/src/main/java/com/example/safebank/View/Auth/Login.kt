@@ -35,8 +35,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.safebank.Model.Entities.AuthRequest
+import com.example.safebank.Model.Safe_Bank_Api.RetrofitInstance
 import com.example.safebank.Navigation.Screen
 import com.example.safebank.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen(
@@ -99,9 +105,23 @@ fun LoginScreen(
             // Login Button
             Button(
                 onClick = {
-                    // TODO: Handle sign up logic
 
-                    navController.navigate(Screen.DashBoard.route)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            val response = RetrofitInstance.api.login(AuthRequest(email, password))
+                            withContext(Dispatchers.Main) {
+                                // Save token in DataStore or SharedPreferences
+//                                navController.navigate("home/${response.token}/${response.accountNumber}")
+
+                                navController.navigate(Screen.DashBoard.route)
+
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                 "Login failed: ${e.message}"
+                            }
+                        }
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
