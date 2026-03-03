@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -22,27 +23,25 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.safebank.Model.Entities.AuthRequest
 import com.example.safebank.Model.Safe_Bank_Api.RetrofitInstance
 import com.example.safebank.Navigation.Screen
 import com.example.safebank.R
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+
 
 @Composable
 fun LoginScreen(
@@ -50,6 +49,9 @@ fun LoginScreen(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     Surface(
         modifier = Modifier
@@ -63,15 +65,12 @@ fun LoginScreen(
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
-
         ) {
-
-            Spacer(modifier = Modifier.height(24.dp))
 
             Text(
                 text = "Welcome Back",
                 style = MaterialTheme.typography.headlineMedium,
-                fontWeight = Bold
+                fontWeight = FontWeight.Bold
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -100,35 +99,51 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(30.dp))
 
-
+            // Show error message
+            if (errorMessage.isNotEmpty()) {
+                Text(
+                    text = errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
             // Login Button
             Button(
                 onClick = {
+                    errorMessage = ""
+                    isLoading = true
 
-                    CoroutineScope(Dispatchers.IO).launch {
+                    // Use coroutine scope for actions triggered by user interaction
+                    scope.launch {
                         try {
                             val response = RetrofitInstance.api.login(AuthRequest(email, password))
-                            withContext(Dispatchers.Main) {
-                                // Save token in DataStore or SharedPreferences
-//                                navController.navigate("home/${response.token}/${response.accountNumber}")
-
-                                navController.navigate(Screen.DashBoard.route)
-
+                            // Navigate on success
+                            navController.navigate(Screen.DashBoard.route) {
+                                popUpTo(Screen.Login.route) { inclusive = true }
                             }
                         } catch (e: Exception) {
-                            withContext(Dispatchers.Main) {
-                                 "Login failed: ${e.message}"
-                            }
+                            errorMessage = "Login failed: ${e.message}"
+                        } finally {
+                            isLoading = false
                         }
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
-                , colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("Login")
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text("Login")
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -139,10 +154,7 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Divider(modifier = Modifier.weight(1f))
-                Text(
-                    text = "  OR  ",
-                    style = MaterialTheme.typography.bodySmall
-                )
+                Text(text = "  OR  ", style = MaterialTheme.typography.bodySmall)
                 Divider(modifier = Modifier.weight(1f))
             }
 
@@ -150,15 +162,13 @@ fun LoginScreen(
 
             // Google Login
             OutlinedButton(
-                onClick = {
-                    // TODO: Google Login
-                }
-                ,
+                onClick = { /* TODO: Google Login */ },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp) ,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background
-                    , contentColor = MaterialTheme.colorScheme.primary
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.primary
                 )
             ) {
                 Icon(
@@ -187,5 +197,3 @@ fun LoginScreen(
         }
     }
 }
-
-
