@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.safebank.Model.Entities.AuthRequest
+import com.example.safebank.Model.Entities.UserRequest
 import com.example.safebank.Model.Safe_Bank_Api.RetrofitInstance
 import com.example.safebank.Navigation.Screen
 import com.example.safebank.R
@@ -174,7 +175,7 @@ fun SignUpScreen(
                         try {
                             // Call your signup API like login
                             RetrofitInstance.api.register(
-                                AuthRequest(name = name, email = email, password = password)
+                                UserRequest(name = name, email = email, password = password)
                             )
 
                             // Navigate to login on success
