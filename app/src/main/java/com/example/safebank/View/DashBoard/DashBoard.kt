@@ -3,6 +3,7 @@ package com.example.safebank.View.DashBoard
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -26,8 +27,10 @@ import com.example.safebank.View.Settings.SettingsScreen
 
 
 @Composable
-fun ScaffoldScreen(navController :  NavHostController){
-
+fun ScaffoldScreen(
+    navController: NavHostController,
+    name: String
+) {
     val bottomNavController = rememberNavController()
 
     Scaffold(
@@ -41,7 +44,7 @@ fun ScaffoldScreen(navController :  NavHostController){
             modifier = Modifier.padding(paddingValues)
         ) {
             composable(BottomScreen.Home.route) {
-                DashBoard()
+                DashBoard(name)
             }
 
             composable(BottomScreen.Settings.route) {
@@ -52,34 +55,33 @@ fun ScaffoldScreen(navController :  NavHostController){
 }
 
 @Composable
-fun DashBoard(){
+fun DashBoard(userName: String) {
 
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
 
+            GreetingBar(userName)   // 👈 Now dynamic
 
-            Column(
-                modifier = Modifier.fillMaxSize()
-                    .padding(15.dp)
-                ,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                GreetingBar("Sj")
+            Spacer(Modifier.height(10.dp))
 
-                Spacer(Modifier.padding(10.dp))
+            BalanceCard("$500", "Bonus + Cash")
 
-                BalanceCard("$500" , "Bonus + Cash")
+            Spacer(Modifier.height(15.dp))
 
-                Spacer(Modifier.padding(15.dp))
+            QuickActionsRow()
 
-                QuickActionsRow()
+            Spacer(Modifier.height(15.dp))
 
-                Spacer(Modifier.padding(15.dp))
-
-                RecentTransactionsSection()
-            }
+            RecentTransactionsSection()
+        }
     }
 }
 

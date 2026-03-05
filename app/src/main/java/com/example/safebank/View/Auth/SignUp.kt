@@ -23,6 +23,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,27 +38,32 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.safebank.Model.Entities.AuthRequest
 import com.example.safebank.Model.Entities.UserRequest
 import com.example.safebank.Model.Safe_Bank_Api.RetrofitInstance
 import com.example.safebank.Navigation.Screen
 import com.example.safebank.R
+import com.example.safebank.ViewModel.AuthUiState
+import com.example.safebank.ViewModel.AuthViewModel
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun SignUpScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
+
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-    var passwordMatch by remember { mutableStateOf(true) }
-    var errorMessage by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
+
+    val state = viewModel.uiState
+
+    val passwordMatch = password == confirmPassword
 
     Surface(
         modifier = Modifier
@@ -65,6 +71,7 @@ fun SignUpScreen(
             .statusBarsPadding(),
         color = MaterialTheme.colorScheme.background
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -79,125 +86,86 @@ fun SignUpScreen(
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(Modifier.height(32.dp))
 
-            // Name
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Name") },
-                placeholder = { Text("User Name") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-            // Email
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
-                placeholder = { Text("user@gmail.com") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-            // Password
             OutlinedTextField(
                 value = password,
-                onValueChange = {
-                    password = it
-                    passwordMatch = password == confirmPassword
-                },
+                onValueChange = { password = it },
                 label = { Text("Password") },
-                singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
+                singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-            // Confirm Password
             OutlinedTextField(
                 value = confirmPassword,
-                onValueChange = {
-                    confirmPassword = it
-                    passwordMatch = password == confirmPassword
-                },
+                onValueChange = { confirmPassword = it },
                 label = { Text("Confirm Password") },
-                singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                isError = !passwordMatch
+                singleLine = true,
+                isError = !passwordMatch,
+                modifier = Modifier.fillMaxWidth()
             )
 
             if (!passwordMatch) {
                 Text(
                     text = "Passwords do not match",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.align(Alignment.Start)
+                    color = MaterialTheme.colorScheme.error
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-            // Show error message
-            if (errorMessage.isNotEmpty()) {
+            // Show error
+            if (state is AuthUiState.Error) {
                 Text(
-                    text = errorMessage,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall
+                    text = state.message,
+                    color = MaterialTheme.colorScheme.error
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(Modifier.height(16.dp))
             }
 
-            // Sign Up Button
             Button(
                 onClick = {
+
                     if (name.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
-                        errorMessage = "Please fill all fields"
                         return@Button
                     }
 
-                    if (!passwordMatch) {
-                        errorMessage = "Passwords do not match"
-                        return@Button
-                    }
+                    if (!passwordMatch) return@Button
 
-                    errorMessage = ""
-                    isLoading = true
-
-                    scope.launch {
-                        try {
-                            // Call your signup API like login
-                            RetrofitInstance.api.register(
-                                UserRequest(name = name, email = email, password = password)
-                            )
-
-                            // Navigate to login on success
-                            navController.navigate(Screen.Login.route) {
-                                popUpTo(Screen.SignUp.route) { inclusive = true }
-                            }
-                        } catch (e: Exception) {
-                            errorMessage = "Sign Up failed: ${e.localizedMessage ?: "Unknown error"}"
-                        } finally {
-                            isLoading = false
-                        }
-                    }
+                    viewModel.register(name, email, password)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    .height(50.dp)
             ) {
-                if (isLoading) {
+
+                if (state is AuthUiState.Loading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
-                        color = MaterialTheme.colorScheme.onPrimary,
                         strokeWidth = 2.dp
                     )
                 } else {
@@ -205,19 +173,27 @@ fun SignUpScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(Modifier.height(24.dp))
 
-            // Login Link
             Row {
                 Text("Already have an account? ")
                 Text(
                     text = "Sign in here",
                     color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Medium,
                     modifier = Modifier.clickable {
                         navController.navigate(Screen.Login.route)
                     }
                 )
+            }
+
+            // Navigate on success
+            if (state is AuthUiState.RegisterSuccess) {
+                LaunchedEffect(Unit) {
+                    viewModel.resetState()
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.SignUp.route) { inclusive = true }
+                    }
+                }
             }
         }
     }

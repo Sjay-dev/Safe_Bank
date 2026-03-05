@@ -35,23 +35,27 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.safebank.Model.Entities.AuthRequest
 import com.example.safebank.Model.Safe_Bank_Api.RetrofitInstance
 import com.example.safebank.Navigation.Screen
 import com.example.safebank.R
+import com.example.safebank.ViewModel.AuthUiState
+import com.example.safebank.ViewModel.AuthViewModel
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun LoginScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
+
+    val state = viewModel.uiState
 
     Surface(
         modifier = Modifier
@@ -75,19 +79,16 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Email
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
-                placeholder = { Text("user@gmail.com") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Password
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -99,46 +100,27 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            // Show error message
-            if (errorMessage.isNotEmpty()) {
+            //  Show Error
+            if (state is AuthUiState.Error) {
                 Text(
-                    text = errorMessage,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall
+                    text = state.message,
+                    color = MaterialTheme.colorScheme.error
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // Login Button
             Button(
                 onClick = {
-                    errorMessage = ""
-                    isLoading = true
-
-                    // Use coroutine scope for actions triggered by user interaction
-                    scope.launch {
-                        try {
-                            val response = RetrofitInstance.api.login(AuthRequest(email, password))
-                            // Navigate on success
-                            navController.navigate(Screen.DashBoard.route) {
-                                popUpTo(Screen.Login.route) { inclusive = true }
-                            }
-                        } catch (e: Exception) {
-                            errorMessage = "Login failed: ${e.message}"
-                        } finally {
-                            isLoading = false
-                        }
-                    }
+                    viewModel.login(email, password)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    .height(50.dp)
             ) {
-                if (isLoading) {
+
+                if (state is AuthUiState.Loading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
-                        color = MaterialTheme.colorScheme.onPrimary,
                         strokeWidth = 2.dp
                     )
                 } else {
@@ -146,53 +128,17 @@ fun LoginScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            //  Navigate on success
+            if (state is AuthUiState.LoginSuccess) {
+                LaunchedEffect(Unit) {
+                    val response = RetrofitInstance.api.login(AuthRequest(email, password))
 
-            // OR Divider
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Divider(modifier = Modifier.weight(1f))
-                Text(text = "  OR  ", style = MaterialTheme.typography.bodySmall)
-                Divider(modifier = Modifier.weight(1f))
-            }
+                    val name = response.name
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Google Login
-            OutlinedButton(
-                onClick = { /* TODO: Google Login */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.google_logo),
-                    contentDescription = "Google",
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Login with Google")
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Sign Up Link
-            Row {
-                Text("Don't have an account yet? ")
-                Text(
-                    text = "Sign Up here",
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.clickable {
-                        navController.navigate(Screen.SignUp.route)
+                    navController.navigate("main/${name}") {
+                        popUpTo(Screen.Login.route) { inclusive = true }
                     }
-                )
+                }
             }
         }
     }
