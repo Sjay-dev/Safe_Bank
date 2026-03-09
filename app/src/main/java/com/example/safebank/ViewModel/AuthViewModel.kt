@@ -19,17 +19,24 @@ class AuthViewModel @Inject constructor(
         private set
 
     fun login(email: String, password: String) {
+
         viewModelScope.launch {
+
+            uiState = AuthUiState.Loading
+
             try {
-                uiState = AuthUiState.Loading
-                repository.login(email, password)
-                uiState = AuthUiState.LoginSuccess
+
+                val response = repository.login(email, password)
+
+                uiState = AuthUiState.LoginSuccess(response.name)
+
             } catch (e: Exception) {
-                uiState = AuthUiState.Error(e.message ?: "Login failed")
+
+                uiState = AuthUiState.Error("Login failed")
+
             }
         }
     }
-
     fun register(name: String, email: String, password: String) {
         viewModelScope.launch {
             try {

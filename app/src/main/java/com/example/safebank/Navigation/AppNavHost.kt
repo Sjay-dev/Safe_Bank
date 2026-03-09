@@ -25,7 +25,7 @@ fun AppNavHost(navController: NavHostController) {
                 type = NavType.StringType
             })
         ) { backStackEntry ->
-            val name = backStackEntry.arguments?.getString("userName") ?: ""
+            val name = backStackEntry.arguments?.getString("name") ?: "" // <-- use "name"
             ScaffoldScreen(navController, name)
         }
     }

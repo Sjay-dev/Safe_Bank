@@ -8,7 +8,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.safebank.Navigation.AppNavHost
 
 import com.example.safebank.ui.theme.SafeBankTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
 
