@@ -29,7 +29,9 @@ import com.example.safebank.View.Settings.SettingsScreen
 @Composable
 fun ScaffoldScreen(
     navController: NavHostController,
-    name: String
+    name: String,
+    accountNumber: String,
+    balance: String
 ) {
     val bottomNavController = rememberNavController()
 
@@ -44,7 +46,7 @@ fun ScaffoldScreen(
             modifier = Modifier.padding(paddingValues)
         ) {
             composable(BottomScreen.Home.route) {
-                DashBoard(name)
+                DashBoard(name, accountNumber, balance)
             }
 
             composable(BottomScreen.Settings.route) {
@@ -55,7 +57,7 @@ fun ScaffoldScreen(
 }
 
 @Composable
-fun DashBoard(userName: String) {
+fun DashBoard(userName: String, accountNumber: String, balance: String) {
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -68,11 +70,13 @@ fun DashBoard(userName: String) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
-            GreetingBar(userName)   // 👈 Now dynamic
+            GreetingBar(userName)
 
             Spacer(Modifier.height(10.dp))
 
-            BalanceCard("$500", "Bonus + Cash")
+            Text(text = "Account: $accountNumber", style = MaterialTheme.typography.bodyMedium)
+            Spacer(Modifier.height(8.dp))
+            BalanceCard("$${balance}", "Current Balance")
 
             Spacer(Modifier.height(15.dp))
 

@@ -1,5 +1,10 @@
 package com.example.safebank.View.Auth
 
+import android.content.Intent
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.IntentSenderRequest
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,21 +36,22 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.safebank.Model.Entities.AuthRequest
-import com.example.safebank.Model.Safe_Bank_Api.RetrofitInstance
 import com.example.safebank.Navigation.Screen
 import com.example.safebank.R
 import com.example.safebank.ViewModel.AuthUiState
 import com.example.safebank.ViewModel.AuthViewModel
+import com.google.android.gms.auth.api.identity.BeginSignInRequest
+import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.gms.auth.api.identity.SignInClient
+import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.launch
-import androidx.lifecycle.viewmodel.compose.viewModel
-
 
 @Composable
 fun LoginScreen(
@@ -55,11 +61,70 @@ fun LoginScreen(
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-
     val state = viewModel.uiState
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    // Google Sign-In setup
+    val signInClient: SignInClient = Identity.getSignInClient(context)
+    val serverClientId = context.getString(R.string.default_web_client_id)
+
+    var googleSignInInProgress by remember { mutableStateOf(false) }
+
+    val signInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        try {
+            val signInCredential = signInClient.getSignInCredentialFromIntent(result.data)
+            val idToken = signInCredential.googleIdToken
+            if (idToken != null) {
+                viewModel.loginWithGoogle(idToken)
+            } else {
+                viewModel.uiState = AuthUiState.Error("No ID token received")
+            }
+        } catch (e: ApiException) {
+            viewModel.uiState = AuthUiState.Error("Google sign-in failed: ${e.statusCode}")
+        } catch (e: Exception) {
+            viewModel.uiState = AuthUiState.Error(e.message ?: "Google sign-in failed")
+        } finally {
+            googleSignInInProgress = false
+        }
+    }
+
+    fun launchGoogleSignIn() {
+        googleSignInInProgress = true
+        try {
+            val signInRequest = BeginSignInRequest.builder()
+                .setGoogleIdTokenRequestOptions(
+                    BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                        .setSupported(true)
+                        .setServerClientId(serverClientId)
+                        .setFilterByAuthorizedAccounts(false)
+                        .build()
+                )
+                .build()
+
+            signInClient.beginSignIn(signInRequest)
+                .addOnSuccessListener { result ->
+                    try {
+                        signInLauncher.launch(
+                            IntentSenderRequest.Builder(result.pendingIntent.intentSender)
+                                .build()
+                        )
+                    } catch (e: Exception) {
+                        googleSignInInProgress = false
+                        viewModel.uiState = AuthUiState.Error("Failed to launch sign-in: ${e.message}")
+                    }
+                }
+                .addOnFailureListener { e ->
+                    googleSignInInProgress = false
+                    viewModel.uiState = AuthUiState.Error("Google sign-in not available: ${e.message}")
+                }
+        } catch (e: Exception) {
+            googleSignInInProgress = false
+            viewModel.uiState = AuthUiState.Error(e.message ?: "Google sign-in failed")
+        }
+    }
 
     Surface(
         modifier = Modifier
@@ -118,13 +183,13 @@ fun LoginScreen(
             //Login Button
             Button(
                 onClick = {
-                    viewModel.login(email, password)
+                viewModel.login(email, password)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(50.dp),
+                enabled = !googleSignInInProgress
             ) {
-
                 if (state is AuthUiState.Loading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
@@ -151,22 +216,30 @@ fun LoginScreen(
 
             // Google Login
             OutlinedButton(
-                onClick = { /* TODO: Google Login */ },
+                onClick = { launchGoogleSignIn() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     contentColor = MaterialTheme.colorScheme.primary
-                )
+                ),
+                enabled = !googleSignInInProgress && state !is AuthUiState.Loading
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.google_logo),
-                    contentDescription = "Google",
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Login with Google")
+                if (googleSignInInProgress) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(R.drawable.google_logo),
+                        contentDescription = "Google",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Login with Google")
+                }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -185,16 +258,13 @@ fun LoginScreen(
             }
         }
 
-            //  Navigate on success
-            if (state is AuthUiState.LoginSuccess) {
-                LaunchedEffect(state) {
-
-
-                    navController.navigate("main/${state.name}") {
-                        popUpTo(Screen.Login.route) { inclusive = true }
-                    }
+        //  Navigate on success
+        if (state is AuthUiState.LoginSuccess) {
+            LaunchedEffect(state) {
+                navController.navigate("main/${state.name}/${state.accountNumber}/${state.balance}") {
+                    popUpTo(Screen.Login.route) { inclusive = true }
                 }
             }
         }
     }
-
+}

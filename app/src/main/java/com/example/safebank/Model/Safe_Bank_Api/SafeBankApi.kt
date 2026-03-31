@@ -2,6 +2,7 @@ package com.example.safebank.Model.Safe_Bank_Api
 
 import com.example.safebank.Model.Entities.AuthRequest
 import com.example.safebank.Model.Entities.AuthResponse
+import com.example.safebank.Model.Entities.GoogleAuthRequest
 import com.example.safebank.Model.Entities.TransferRequest
 import com.example.safebank.Model.Entities.TransferResponse
 import com.example.safebank.Model.Entities.UserRequest
@@ -14,6 +15,9 @@ interface SafeBankApi {
 
     @POST("api/auth/login")
     suspend fun login(@Body request: AuthRequest): AuthResponse
+
+    @POST("api/auth/google")
+    suspend fun loginWithGoogle(@Body request: GoogleAuthRequest): AuthResponse
 
     @POST("api/transfers")
     suspend fun performTransfer(

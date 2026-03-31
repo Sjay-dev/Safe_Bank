@@ -20,13 +20,17 @@ fun AppNavHost(navController: NavHostController) {
         composable(Screen.SignUp.route) { SignUpScreen(navController) }
 
         composable(
-            route = "main/{name}",
-            arguments = listOf(navArgument("name") {
-                type = NavType.StringType
-            })
+            route = "main/{name}/{accountNumber}/{balance}",
+            arguments = listOf(
+                navArgument("name") { type = NavType.StringType },
+                navArgument("accountNumber") { type = NavType.StringType },
+                navArgument("balance") { type = NavType.StringType }
+            )
         ) { backStackEntry ->
-            val name = backStackEntry.arguments?.getString("name") ?: "" // <-- use "name"
-            ScaffoldScreen(navController, name)
+            val name = backStackEntry.arguments?.getString("name") ?: ""
+            val accountNumber = backStackEntry.arguments?.getString("accountNumber") ?: ""
+            val balance = backStackEntry.arguments?.getString("balance") ?: ""
+            ScaffoldScreen(navController, name, accountNumber, balance)
         }
     }
 }

@@ -16,27 +16,31 @@ class AuthViewModel @Inject constructor(
 ) : ViewModel() {
 
     var uiState by mutableStateOf<AuthUiState>(AuthUiState.Idle)
-        private set
 
     fun login(email: String, password: String) {
-
         viewModelScope.launch {
-
             uiState = AuthUiState.Loading
-
             try {
-
                 val response = repository.login(email, password)
-
-                uiState = AuthUiState.LoginSuccess(response.name)
-
+                uiState = AuthUiState.LoginSuccess(response.name, response.accountNumber.toString(), response.balance)
             } catch (e: Exception) {
-
                 uiState = AuthUiState.Error("Login failed")
-
             }
         }
     }
+
+    fun loginWithGoogle(idToken: String) {
+        viewModelScope.launch {
+            uiState = AuthUiState.Loading
+            try {
+                val response = repository.loginWithGoogle(idToken)
+                uiState = AuthUiState.LoginSuccess(response.name, response.accountNumber.toString(), response.balance)
+            } catch (e: Exception) {
+                uiState = AuthUiState.Error(e.message ?: "Google sign-in failed")
+            }
+        }
+    }
+
     fun register(name: String, email: String, password: String) {
         viewModelScope.launch {
             try {
