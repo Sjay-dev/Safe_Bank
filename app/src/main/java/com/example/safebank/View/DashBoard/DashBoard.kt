@@ -46,7 +46,7 @@ fun ScaffoldScreen(
             modifier = Modifier.padding(paddingValues)
         ) {
             composable(BottomScreen.Home.route) {
-                DashBoard(name, accountNumber, balance)
+                DashBoard(name, accountNumber, balance , navController)
             }
 
             composable(BottomScreen.Settings.route) {
@@ -57,7 +57,7 @@ fun ScaffoldScreen(
 }
 
 @Composable
-fun DashBoard(userName: String, accountNumber: String, balance: String) {
+fun DashBoard(userName: String, accountNumber: String, balance: String ,     navController: NavController) {
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -74,13 +74,11 @@ fun DashBoard(userName: String, accountNumber: String, balance: String) {
 
             Spacer(Modifier.height(10.dp))
 
-            Text(text = "Account: $accountNumber", style = MaterialTheme.typography.bodyMedium)
-            Spacer(Modifier.height(8.dp))
             BalanceCard("$${balance}", "Current Balance")
 
             Spacer(Modifier.height(15.dp))
 
-            QuickActionsRow()
+            QuickActionsRow(navController)
 
             Spacer(Modifier.height(15.dp))
 

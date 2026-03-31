@@ -9,6 +9,7 @@ import androidx.navigation.navArgument
 import com.example.safebank.View.Auth.LoginScreen
 import com.example.safebank.View.Auth.SignUpScreen
 import com.example.safebank.View.DashBoard.ScaffoldScreen
+import com.example.safebank.View.DashBoard.TransferScreen
 
 
 @Composable
@@ -18,6 +19,14 @@ fun AppNavHost(navController: NavHostController) {
         composable(Screen.Login.route) { LoginScreen(navController) }
 
         composable(Screen.SignUp.route) { SignUpScreen(navController) }
+
+        composable(Screen.TransferScreen.route) {
+            TransferScreen(
+                onBackClick = { navController.popBackStack() },
+                onHistoryClick = { /* TODO */ },
+                onTransferClick = { /* TODO */ }
+            )
+        }
 
         composable(
             route = "main/{name}/{accountNumber}/{balance}",
