@@ -23,11 +23,11 @@ fun AppNavHost(navController: NavHostController) {
         composable(Screen.TransferScreen.route) {
             TransferScreen(
                 onBackClick = { navController.popBackStack() },
-                onHistoryClick = { /* TODO */ },
-                onTransferClick = { /* TODO */ }
+                onTransferClick = { accountNumber ->
+                    navController.navigate("transferDetails/$accountNumber")
+                }
             )
         }
-
         composable(
             route = "main/{name}/{accountNumber}/{balance}",
             arguments = listOf(
