@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun TransferScreen(
@@ -96,11 +97,38 @@ fun TransferScreen(
 
                     OutlinedTextField(
                         value = accountNumber,
-                        onValueChange = { accountNumber = it },
+                        onValueChange = {
+                            accountNumber = it
+
+                            if (it.length == 10) {
+                                viewModel.fetchUser(it)
+                            }
+                        },
                         placeholder = { Text("Enter account number") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
+
+                    when {
+                        viewModel.isLoading -> {
+                            Text("Checking account...", color = Color.Gray)
+                        }
+
+                        viewModel.recipientName != null -> {
+                            Text(
+                                text = viewModel.recipientName!!,
+                                color = Color.Green,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        viewModel.error != null -> {
+                            Text(
+                                text = viewModel.error!!,
+                                color = Color.Red
+                            )
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
