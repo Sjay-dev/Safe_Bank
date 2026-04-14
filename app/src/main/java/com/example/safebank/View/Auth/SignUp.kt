@@ -40,9 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.safebank.Model.Entities.AuthRequest
-import com.example.safebank.Model.Entities.UserRequest
-import com.example.safebank.Model.Safe_Bank_Api.RetrofitInstance
+
 import com.example.safebank.Navigation.Screen
 import com.example.safebank.R
 import com.example.safebank.ViewModel.AuthUiState

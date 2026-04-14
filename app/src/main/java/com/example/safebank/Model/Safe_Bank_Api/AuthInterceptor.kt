@@ -12,7 +12,6 @@ class AuthInterceptor(
 
         val token = tokenProvider.getToken()
 
-        Log.d("TOKEN_SENT", token)
 
         val request = chain.request().newBuilder()
             .addHeader("Authorization", "Bearer $token")

@@ -22,14 +22,13 @@ interface SafeBankApi {
 
     @POST("api/transfers")
     suspend fun performTransfer(
-        @Body request: TransferRequest,
-        @Header("Authorization") token: String
+        @Body request: TransferRequest
     ): TransferResponse
 
     @GET("api/ping")
     suspend fun ping(): Response<String>
 
-    @GET("api/users/account/{accountNumber}")
+    @GET("api/users/{accountNumber}")
     suspend fun getUserByAccountNumber(
         @Path("accountNumber") accountNumber: String,
     ): Response<UserResponse>

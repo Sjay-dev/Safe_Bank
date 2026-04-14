@@ -9,5 +9,5 @@ data class UserResponse(
     val email: String,
     val accountNumber: String,
     val balance: BigDecimal,
-    val createdAt: LocalDateTime
+    val createdAt: String
 )

@@ -26,11 +26,9 @@ class AuthViewModel @Inject constructor(
             try {
                 val response = repository.login(email, password)
 
-                Log.d("AuthViewModel", "Login response: $response")
 
                 tokenProvider.saveToken(response.token)
 
-                Log.d("TOKEN_SAVED", tokenProvider.getToken())
 
                 uiState = AuthUiState.LoginSuccess(response.name, response.accountNumber.toString(), response.balance, response.token)
             } catch (e: Exception) {
