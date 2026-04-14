@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.safebank.ViewModel.TransferViewModel
 
 @Composable
 fun TransferScreen(
@@ -27,6 +27,13 @@ fun TransferScreen(
 ) {
     var accountNumber by remember { mutableStateOf("") }
 
+    // ✅ Hilt ViewModel
+    val viewModel: TransferViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+
+    // ✅ Direct state (since you're using mutableStateOf in ViewModel)
+    val recipientName = viewModel.recipientName
+    val error = viewModel.error
+    val isLoading = viewModel.isLoading
 
     Box(
         modifier = Modifier
@@ -41,7 +48,7 @@ fun TransferScreen(
                 .padding(bottom = 80.dp)
         ) {
 
-            //  Top Bar
+            // Top Bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -82,7 +89,7 @@ fun TransferScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            //  Input Account Number
+            // Input Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -100,8 +107,13 @@ fun TransferScreen(
                         onValueChange = {
                             accountNumber = it
 
+                            // ✅ Trigger API at 10 digits
                             if (it.length == 10) {
                                 viewModel.fetchUser(it)
+                            } else {
+                                // Reset state if user edits again
+                                viewModel.recipientName = null
+                                viewModel.error = null
                             }
                         },
                         placeholder = { Text("Enter account number") },
@@ -109,22 +121,25 @@ fun TransferScreen(
                         singleLine = true
                     )
 
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // ✅ Status UI
                     when {
-                        viewModel.isLoading -> {
+                        isLoading -> {
                             Text("Checking account...", color = Color.Gray)
                         }
 
-                        viewModel.recipientName != null -> {
+                        recipientName != null -> {
                             Text(
-                                text = viewModel.recipientName!!,
-                                color = Color.Green,
+                                text = recipientName,
+                                color = Color(0xFF2E7D32), // nicer green
                                 fontWeight = FontWeight.Bold
                             )
                         }
 
-                        viewModel.error != null -> {
+                        error != null -> {
                             Text(
-                                text = viewModel.error!!,
+                                text = error,
                                 color = Color.Red
                             )
                         }
@@ -141,10 +156,10 @@ fun TransferScreen(
             }
         }
 
-        //  Bottom Button
+        // Bottom Button
         Button(
             onClick = { onTransferClick(accountNumber) },
-            enabled = accountNumber.isNotBlank(),
+            enabled = accountNumber.length == 10 && recipientName != null, // ✅ safer
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .align(Alignment.BottomCenter)

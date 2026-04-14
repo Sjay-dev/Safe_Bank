@@ -4,4 +4,5 @@ data class AuthResponse( val token: String,
                          val name: String,
                          val email: String,
                          val accountNumber: Long,
-                         val balance: String)
+                         val balance: String,
+                        )

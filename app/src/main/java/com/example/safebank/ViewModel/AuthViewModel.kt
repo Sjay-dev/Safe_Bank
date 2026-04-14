@@ -1,18 +1,21 @@
 package com.example.safebank.ViewModel
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.safebank.Model.Repository.AuthRepository
+import com.example.safebank.Model.Safe_Bank_Api.TokenProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val repository: AuthRepository
+    private val repository: AuthRepository,
+    private val  tokenProvider: TokenProvider
 ) : ViewModel() {
 
     var uiState by mutableStateOf<AuthUiState>(AuthUiState.Idle)
@@ -22,7 +25,14 @@ class AuthViewModel @Inject constructor(
             uiState = AuthUiState.Loading
             try {
                 val response = repository.login(email, password)
-                uiState = AuthUiState.LoginSuccess(response.name, response.accountNumber.toString(), response.balance)
+
+                Log.d("AuthViewModel", "Login response: $response")
+
+                tokenProvider.saveToken(response.token)
+
+                Log.d("TOKEN_SAVED", tokenProvider.getToken())
+
+                uiState = AuthUiState.LoginSuccess(response.name, response.accountNumber.toString(), response.balance, response.token)
             } catch (e: Exception) {
                 uiState = AuthUiState.Error("Login failed")
             }
@@ -34,7 +44,7 @@ class AuthViewModel @Inject constructor(
             uiState = AuthUiState.Loading
             try {
                 val response = repository.loginWithGoogle(idToken)
-                uiState = AuthUiState.LoginSuccess(response.name, response.accountNumber.toString(), response.balance)
+                uiState = AuthUiState.LoginSuccess(response.name, response.accountNumber.toString(), response.balance, response.token)
             } catch (e: Exception) {
                 uiState = AuthUiState.Error(e.message ?: "Google sign-in failed")
             }

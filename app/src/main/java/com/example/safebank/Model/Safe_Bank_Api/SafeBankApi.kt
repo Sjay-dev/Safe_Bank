@@ -6,6 +6,7 @@ import com.example.safebank.Model.Entities.GoogleAuthRequest
 import com.example.safebank.Model.Entities.TransferRequest
 import com.example.safebank.Model.Entities.TransferResponse
 import com.example.safebank.Model.Entities.UserRequest
+import com.example.safebank.Model.Entities.UserResponse
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -27,10 +28,15 @@ interface SafeBankApi {
 
     @GET("api/ping")
     suspend fun ping(): Response<String>
+
+    @GET("api/users/account/{accountNumber}")
+    suspend fun getUserByAccountNumber(
+        @Path("accountNumber") accountNumber: String,
+    ): Response<UserResponse>
 }
 
-    //      Transfer History
-
+//          Transfer History
+//
 //    @GET("api/transfers/history")
 //    suspend fun getTransferHistory(
 //        @Header("Authorization") token: String,

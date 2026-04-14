@@ -52,6 +52,7 @@ import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.launch
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun LoginScreen(
@@ -67,7 +68,7 @@ fun LoginScreen(
 
     // Google Sign-In setup
     val signInClient: SignInClient = Identity.getSignInClient(context)
-    val serverClientId = context.getString(R.string.default_web_client_id)
+    val serverClientId = stringResource(R.string.default_web_client_id)
 
     var googleSignInInProgress by remember { mutableStateOf(false) }
 

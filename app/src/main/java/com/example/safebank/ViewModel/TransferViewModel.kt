@@ -5,10 +5,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.safebank.Model.Repository.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
-class TransferViewModel : ViewModel() {
+@HiltViewModel
+class TransferViewModel @Inject constructor(
+    private val repository: UserRepository
+) : ViewModel() {
 
     var recipientName by mutableStateOf<String?>(null)
     var isLoading by mutableStateOf(false)
@@ -24,7 +30,7 @@ class TransferViewModel : ViewModel() {
 
                 recipientName = user.name
             } catch (e: Exception) {
-                error = "Account not found"
+                error = e.message ?: "Account not found"
                 recipientName = null
             } finally {
                 isLoading = false
