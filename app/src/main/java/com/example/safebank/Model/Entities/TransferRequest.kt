@@ -1,8 +1,7 @@
 package com.example.safebank.Model.Entities
 
 data class TransferRequest(
-    val senderAccountNumber: Long,
-    val receiverAccountNumber: Long,
+    val receiverAccountNumber: String,
     val amount: Double,
     val description: String
 )

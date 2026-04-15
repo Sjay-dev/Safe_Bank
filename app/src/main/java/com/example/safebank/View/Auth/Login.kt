@@ -43,7 +43,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.safebank.Navigation.Screen
 import com.example.safebank.R
 import com.example.safebank.ViewModel.AuthUiState
 import com.example.safebank.ViewModel.AuthViewModel
@@ -53,6 +52,9 @@ import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.launch
 import androidx.compose.ui.res.stringResource
+import com.example.safebank.Navigation.LoginRoute
+import com.example.safebank.Navigation.MainRoute
+import com.example.safebank.Navigation.SignUpRoute
 
 @Composable
 fun LoginScreen(
@@ -253,7 +255,7 @@ fun LoginScreen(
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.clickable {
-                        navController.navigate(Screen.SignUp.route)
+                        navController.navigate(SignUpRoute)
                     }
                 )
             }
@@ -262,8 +264,14 @@ fun LoginScreen(
         //  Navigate on success
         if (state is AuthUiState.LoginSuccess) {
             LaunchedEffect(state) {
-                navController.navigate("main/${state.name}/${state.accountNumber}/${state.balance}") {
-                    popUpTo(Screen.Login.route) { inclusive = true }
+                navController.navigate(
+                    MainRoute(
+                        name = state.name,
+                        accountNumber = state.accountNumber,
+                        balance = state.balance
+                    )
+                ) {
+                    popUpTo<LoginRoute> { inclusive = true }
                 }
             }
         }

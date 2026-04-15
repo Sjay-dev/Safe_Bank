@@ -6,40 +6,60 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.example.safebank.View.Auth.LoginScreen
 import com.example.safebank.View.Auth.SignUpScreen
 import com.example.safebank.View.DashBoard.ScaffoldScreen
+import com.example.safebank.View.DashBoard.TransferDetailsScreen
 import com.example.safebank.View.DashBoard.TransferScreen
 
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = Screen.Login.route) {
+    NavHost(navController = navController, startDestination = LoginRoute) {
 
-        composable(Screen.Login.route) { LoginScreen(navController) }
 
-        composable(Screen.SignUp.route) { SignUpScreen(navController) }
+        composable<LoginRoute> {
+            LoginScreen(navController)
+        }
 
-        composable(Screen.TransferScreen.route) {
+        composable<SignUpRoute> {
+            SignUpScreen(navController)
+        }
+
+        composable<TransferRoute> {
             TransferScreen(
                 onBackClick = { navController.popBackStack() },
-                onTransferClick = { accountNumber ->
-                    navController.navigate("transferDetails/$accountNumber")
+                onTransferClick = { accountNumber, recipientName ->
+                    navController.navigate(
+                        TransferDetailsRoute(
+                            accountNumber = accountNumber,
+                            recipientName = recipientName
+                        )
+                    )
                 }
             )
         }
-        composable(
-            route = "main/{name}/{accountNumber}/{balance}",
-            arguments = listOf(
-                navArgument("name") { type = NavType.StringType },
-                navArgument("accountNumber") { type = NavType.StringType },
-                navArgument("balance") { type = NavType.StringType }
+
+        composable<TransferDetailsRoute> { backStackEntry ->
+            val route: TransferDetailsRoute = backStackEntry.toRoute()
+
+            TransferDetailsScreen(
+                accountNumber = route.accountNumber,
+                name = route.recipientName,
+                onBackClick = { navController.popBackStack() },
             )
-        ) { backStackEntry ->
-            val name = backStackEntry.arguments?.getString("name") ?: ""
-            val accountNumber = backStackEntry.arguments?.getString("accountNumber") ?: ""
-            val balance = backStackEntry.arguments?.getString("balance") ?: ""
-            ScaffoldScreen(navController, name, accountNumber, balance)
+        }
+
+        composable<MainRoute> { backStackEntry ->
+            val route: MainRoute = backStackEntry.toRoute()
+
+            ScaffoldScreen(
+                navController = navController,
+                name = route.name,
+                accountNumber = route.accountNumber,
+                balance = route.balance
+            )
         }
     }
 }

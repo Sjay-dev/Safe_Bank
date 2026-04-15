@@ -40,8 +40,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.safebank.Navigation.LoginRoute
+import com.example.safebank.Navigation.SignUpRoute
 
-import com.example.safebank.Navigation.Screen
 import com.example.safebank.R
 import com.example.safebank.ViewModel.AuthUiState
 import com.example.safebank.ViewModel.AuthViewModel
@@ -179,7 +180,7 @@ fun SignUpScreen(
                     text = "Sign in here",
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable {
-                        navController.navigate(Screen.Login.route)
+                        navController.navigate(LoginRoute)
                     }
                 )
             }
@@ -188,8 +189,8 @@ fun SignUpScreen(
             if (state is AuthUiState.RegisterSuccess) {
                 LaunchedEffect(Unit) {
                     viewModel.resetState()
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(Screen.SignUp.route) { inclusive = true }
+                    navController.navigate(LoginRoute) {
+                        popUpTo(SignUpRoute) { inclusive = true }
                     }
                 }
             }

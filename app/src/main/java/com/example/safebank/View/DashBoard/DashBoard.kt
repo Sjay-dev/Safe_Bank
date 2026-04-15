@@ -57,7 +57,7 @@ fun ScaffoldScreen(
 }
 
 @Composable
-fun DashBoard(userName: String, accountNumber: String, balance: String ,     navController: NavController) {
+fun DashBoard(userName: String, accountNumber: String, balance: String ,    navController: NavController) {
 
     Surface(
         modifier = Modifier.fillMaxSize(),

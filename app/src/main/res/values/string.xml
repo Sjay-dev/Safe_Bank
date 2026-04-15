@@ -2,4 +2,6 @@
 
     <resources>
         <string name="app_name">Safe Bank</string>
+
+    <string name="default_web_client_id">115773047674-lvepksc64sgm0bal7np7q8ptdqomr1qk.apps.googleusercontent.com</string>
     </resources>

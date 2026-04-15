@@ -23,7 +23,7 @@ import com.example.safebank.ViewModel.TransferViewModel
 @Composable
 fun TransferScreen(
     onBackClick: () -> Unit,
-    onTransferClick: (String) -> Unit
+    onTransferClick: (String , String) -> Unit
 ) {
     var accountNumber by remember { mutableStateOf("") }
 
@@ -112,8 +112,8 @@ fun TransferScreen(
                                 viewModel.fetchUser(it)
                             } else {
                                 // Reset state if user edits again
-                                viewModel.recipientName = null
-                                viewModel.error = null
+                                viewModel.recipientName
+                                viewModel.error
                             }
                         },
                         placeholder = { Text("Enter account number") },
@@ -158,7 +158,7 @@ fun TransferScreen(
 
         // Bottom Button
         Button(
-            onClick = { onTransferClick(accountNumber) },
+            onClick = { onTransferClick(accountNumber , recipientName!!) },
             enabled = accountNumber.length == 10 && recipientName != null, // ✅ safer
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier

@@ -1,5 +1,6 @@
 package com.example.safebank.Model.Repository
 
+import com.example.safebank.Model.Entities.TransferRequest
 import com.example.safebank.Model.Entities.UserResponse
 import com.example.safebank.Model.Safe_Bank_Api.SafeBankApi
 import javax.inject.Inject
@@ -16,5 +17,19 @@ class UserRepository @Inject constructor(
         } else {
             throw Exception("Error: ${response.code()}")
         }
+    }
+
+    suspend fun performTransfer(
+        accountNumber: String,
+        amount: Double,
+        description: String
+    ) {
+        api.performTransfer(
+            TransferRequest(
+                receiverAccountNumber = accountNumber,
+                amount = amount,
+                description = description
+            )
+        )
     }
 }

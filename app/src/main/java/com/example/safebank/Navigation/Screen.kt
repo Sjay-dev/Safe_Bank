@@ -1,11 +1,28 @@
 package com.example.safebank.Navigation
 
-sealed class Screen(val route : String) {
-    object Login : Screen("login")
-    object SignUp : Screen("signup")
-    object DashBoard : Screen("dashboard")
-    object TransferScreen : Screen("transfer_screen")
-}
+import kotlinx.serialization.Serializable
+
+@Serializable
+object LoginRoute
+
+@Serializable
+object SignUpRoute
+
+@Serializable
+object TransferRoute
+
+@Serializable
+data class TransferDetailsRoute(
+    val accountNumber: String,
+    val recipientName: String
+)
+
+@Serializable
+data class MainRoute(
+    val name: String,
+    val accountNumber: String,
+    val balance: String
+)
 
 
 

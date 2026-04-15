@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.safebank.Navigation.Screen
+import com.example.safebank.Navigation.TransferRoute
 
 @Composable
 fun QuickActionsRow(navController: NavController) {
@@ -35,7 +35,7 @@ fun QuickActionsRow(navController: NavController) {
             icon = Icons.Default.Send,
             label = "Transfer to SafeBank" ,
             onClick = {
-                navController.navigate(Screen.TransferScreen.route)
+                navController.navigate(TransferRoute)
             }
         )
 
