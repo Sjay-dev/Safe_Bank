@@ -268,7 +268,8 @@ fun LoginScreen(
                     MainRoute(
                         name = state.name,
                         accountNumber = state.accountNumber,
-                        balance = state.balance
+                        balance = state.balance ,
+                        token = state.token
                     )
                 ) {
                     popUpTo<LoginRoute> { inclusive = true }

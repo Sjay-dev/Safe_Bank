@@ -13,9 +13,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -24,6 +26,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.safebank.Navigation.BottomScreen
 import com.example.safebank.View.Settings.SettingsScreen
+import com.example.safebank.ViewModel.TransferViewModel
 
 
 @Composable
@@ -31,7 +34,8 @@ fun ScaffoldScreen(
     navController: NavHostController,
     name: String,
     accountNumber: String,
-    balance: String
+    balance: String,
+    token : String
 ) {
     val bottomNavController = rememberNavController()
 
@@ -46,7 +50,7 @@ fun ScaffoldScreen(
             modifier = Modifier.padding(paddingValues)
         ) {
             composable(BottomScreen.Home.route) {
-                DashBoard(name, accountNumber, balance , navController)
+                DashBoard(name, accountNumber, balance , navController , token)
             }
 
             composable(BottomScreen.Settings.route) {
@@ -57,7 +61,15 @@ fun ScaffoldScreen(
 }
 
 @Composable
-fun DashBoard(userName: String, accountNumber: String, balance: String ,    navController: NavController) {
+fun DashBoard(userName: String, accountNumber: String, balance: String ,    navController: NavController
+,    token: String
+) {
+
+    val viewmodel: TransferViewModel = hiltViewModel()
+
+    LaunchedEffect(Unit) {
+        viewmodel.loadTransactions(token)
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -82,7 +94,7 @@ fun DashBoard(userName: String, accountNumber: String, balance: String ,    navC
 
             Spacer(Modifier.height(15.dp))
 
-            RecentTransactionsSection()
+            RecentTransactionsSection(viewmodel.transactions)
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.safebank.Model.Repository
 
 import com.example.safebank.Model.Entities.TransferRequest
+import com.example.safebank.Model.Entities.TransferResponse
 import com.example.safebank.Model.Entities.UserResponse
 import com.example.safebank.Model.Safe_Bank_Api.SafeBankApi
 import javax.inject.Inject
@@ -23,8 +24,8 @@ class UserRepository @Inject constructor(
         accountNumber: String,
         amount: Double,
         description: String
-    ) {
-        api.performTransfer(
+    ): TransferResponse {
+        return api.performTransfer(
             TransferRequest(
                 receiverAccountNumber = accountNumber,
                 amount = amount,
@@ -32,4 +33,44 @@ class UserRepository @Inject constructor(
             )
         )
     }
+
+    suspend fun getTransferHistory(token: String): List<TransferResponse> {
+        val response = api.getTransferHistory("Bearer $token")
+        return response.content
+    }
+
+    suspend fun getTransactionWithNames(token: String): List<TransactionUI> {
+        val transactions = api.getTransferHistory("Bearer $token").content
+
+        return transactions.map { transaction ->
+
+            val accountToFetch = if (transaction.transactionType == "CREDIT") {
+                transaction.senderAccountNumber
+            } else {
+                transaction.receiverAccountNumber
+            }
+
+            val userResponse = api.getUserByAccountNumber(accountToFetch)
+
+            val name = if (userResponse.isSuccessful) {
+                userResponse.body()?.name ?: "Unknown"
+            } else {
+                "Unknown"
+            }
+
+            TransactionUI(
+                name = name,
+                amount = transaction.amount,
+                isCredit = transaction.transactionType == "CREDIT",
+                description = transaction.description
+            )
+        }
+    }
+
+    data class TransactionUI(
+        val name: String,
+        val amount: Double,
+        val isCredit: Boolean,
+        val description: String
+    )
 }

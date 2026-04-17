@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun BalanceCard(
-    balance: String = "$8,750.45",
-    label: String = "Bonus + cash"
+    balance: String,
+    label: String,
 ) {
     Card(
         modifier = Modifier
@@ -82,4 +82,3 @@ fun BalanceCard(
     }
 }
 
-// TODO: Balance Crad Section(Create a Section for the remaining Buttons

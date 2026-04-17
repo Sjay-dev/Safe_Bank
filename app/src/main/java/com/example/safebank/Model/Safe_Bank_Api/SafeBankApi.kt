@@ -3,6 +3,7 @@ package com.example.safebank.Model.Safe_Bank_Api
 import com.example.safebank.Model.Entities.AuthRequest
 import com.example.safebank.Model.Entities.AuthResponse
 import com.example.safebank.Model.Entities.GoogleAuthRequest
+import com.example.safebank.Model.Entities.TransferHistoryResponse
 import com.example.safebank.Model.Entities.TransferRequest
 import com.example.safebank.Model.Entities.TransferResponse
 import com.example.safebank.Model.Entities.UserRequest
@@ -32,14 +33,14 @@ interface SafeBankApi {
     suspend fun getUserByAccountNumber(
         @Path("accountNumber") accountNumber: String,
     ): Response<UserResponse>
-}
 
-//          Transfer History
-//
-//    @GET("api/transfers/history")
-//    suspend fun getTransferHistory(
-//        @Header("Authorization") token: String,
-//        @Query("page") page: Int = 0,
-//        @Query("size") size: Int = 10
-//    ): TransferHistoryResponse
-//}
+    @GET("api/transfers/history")
+    suspend fun getTransferHistory(
+        @Header("Authorization") token: String,
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 10
+    ): TransferHistoryResponse
+
+    }
+
+

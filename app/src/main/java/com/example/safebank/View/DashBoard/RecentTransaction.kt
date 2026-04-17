@@ -12,65 +12,67 @@ import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
+import com.example.safebank.Model.Entities.TransferResponse
+import com.example.safebank.Model.Repository.UserRepository
+
 @Composable
-fun RecentTransactionsSection() {
+fun RecentTransactionsSection(
+    transactions: List<TransferResponse>
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(6.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        )
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f)
-                .padding(16.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
 
-            // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = "Recent Transactions",
-                    fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
 
                 Text(
                     text = "See all",
-                    fontSize = 12.sp,
                     color = Color(0xFF2563EB)
                 )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Transactions List
-            TransactionItem(
-                iconColor = Color.Red,
-                title = "Apple Store",
-                subtitle = "Entertainment",
-                amount = "-$5.99"
-            )
+            transactions.take(5).forEach { transaction ->
 
-            TransactionItem(
-                iconColor = Color(0xFF2563EB),
-                title = "Spotify",
-                subtitle = "Music",
-                amount = "-$3.00"
-            )
+                val isCredit =
+                    transaction.transactionType == "CREDIT"
 
-            TransactionItem(
-                iconColor = Color(0xFFF59E0B),
-                title = "Money Transfer",
-                subtitle = "Transaction",
-                amount = "+$25.00"
-            )
+                val title =
+                    if (isCredit)
+                        transaction.senderName
+                    else
+                        transaction.receiverName
+
+                TransactionItem(
+                    iconColor = if (isCredit)
+                        Color(0xFF16A34A)
+                    else Color.Red,
+
+                    title = title,
+
+                    subtitle = transaction.description,
+
+                    amount =
+                        if (isCredit)
+                            "+₦${transaction.amount}"
+                        else
+                            "-₦${transaction.amount}"
+                )
+            }
         }
     }
 }

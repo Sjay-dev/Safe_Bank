@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.safebank.Model.Entities.TransferResponse
 import com.example.safebank.Model.Repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -25,7 +26,7 @@ class TransferViewModel @Inject constructor(
     var error by mutableStateOf<String?>(null)
         private set
 
-    var transferSuccess by mutableStateOf(false)
+    var transferResult by mutableStateOf<TransferResponse?>(null)
         private set
 
     // ✅ Fetch user (already good)
@@ -47,7 +48,7 @@ class TransferViewModel @Inject constructor(
         }
     }
 
-    // 🚀 ADD THIS (THIS IS YOUR MISSING PIECE)
+    // ADD THIS (THIS IS YOUR MISSING PIECE)
     fun performTransfer(
         accountNumber: String,
         amount: Double,
@@ -57,20 +58,30 @@ class TransferViewModel @Inject constructor(
             try {
                 isLoading = true
                 error = null
-                transferSuccess = false
 
-                repository.performTransfer(
+                transferResult = repository.performTransfer(
                     accountNumber = accountNumber,
                     amount = amount,
                     description = remark
                 )
 
-                transferSuccess = true
-
             } catch (e: Exception) {
                 error = e.message ?: "Transfer failed"
             } finally {
                 isLoading = false
+            }
+        }
+    }
+
+    var transactions by mutableStateOf<List<TransferResponse>>(emptyList())
+        private set
+
+    fun loadTransactions(token: String) {
+        viewModelScope.launch {
+            try {
+                transactions = repository.getTransferHistory(token)
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }

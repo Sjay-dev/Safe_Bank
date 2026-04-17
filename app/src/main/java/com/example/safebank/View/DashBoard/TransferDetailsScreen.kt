@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.safebank.ViewModel.TransferViewModel
 
 
@@ -45,6 +46,7 @@ import com.example.safebank.ViewModel.TransferViewModel
 fun TransferDetailsScreen(
     name: String,
     accountNumber: String,
+    navController: NavController,
     onBackClick: () -> Unit
 ) {
     val viewModel: TransferViewModel = hiltViewModel()
@@ -52,9 +54,19 @@ fun TransferDetailsScreen(
     var amount by remember { mutableStateOf("") }
     var remark by remember { mutableStateOf("") }
 
-    LaunchedEffect(viewModel.transferSuccess) {
-        if (viewModel.transferSuccess) {
-            onBackClick()
+    LaunchedEffect(viewModel.transferResult) {
+
+        viewModel.transferResult?.let { result ->
+
+            navController.navigate(
+                "receipt/" +
+                        "${result.amount}/" +
+                        "${result.receiverName}/" +
+                        "${result.receiverAccountNumber}/" +
+                        "$name/" +
+                        "${result.senderAccountNumber}/" +
+                        "${result.createdAt}"
+            )
         }
     }
 

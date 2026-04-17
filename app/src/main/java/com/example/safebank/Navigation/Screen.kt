@@ -21,7 +21,8 @@ data class TransferDetailsRoute(
 data class MainRoute(
     val name: String,
     val accountNumber: String,
-    val balance: String
+    val balance: String ,
+    val token : String
 )
 
 

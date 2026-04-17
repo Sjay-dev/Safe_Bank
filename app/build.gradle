@@ -78,6 +78,7 @@ dependencies {
 
     implementation "com.google.dagger:hilt-android:2.51"
     implementation libs.androidx.compose.ui.graphics
+    implementation libs.androidx.compose.material3
     kapt "com.google.dagger:hilt-compiler:2.51"
     implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
     implementation libs.play.services.auth
