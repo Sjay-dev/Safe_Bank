@@ -40,16 +40,20 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.safebank.ViewModel.TransferViewModel
+import com.example.safebank.ViewModel.UserViewModel
 
 
 @Composable
 fun TransferDetailsScreen(
     name: String,
+    senderAccountNumber: String,
     accountNumber: String,
     navController: NavController,
     onBackClick: () -> Unit
 ) {
     val viewModel: TransferViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
+
 
     var amount by remember { mutableStateOf("") }
     var remark by remember { mutableStateOf("") }
@@ -57,6 +61,8 @@ fun TransferDetailsScreen(
     LaunchedEffect(viewModel.transferResult) {
 
         viewModel.transferResult?.let { result ->
+
+         userViewModel.refreshBalance(senderAccountNumber)
 
             navController.navigate(
                 "receipt/" +

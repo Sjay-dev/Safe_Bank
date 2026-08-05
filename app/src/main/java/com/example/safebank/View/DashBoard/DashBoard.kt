@@ -27,6 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.safebank.Navigation.BottomScreen
 import com.example.safebank.View.Settings.SettingsScreen
 import com.example.safebank.ViewModel.TransferViewModel
+import com.example.safebank.ViewModel.UserViewModel
 
 
 @Composable
@@ -65,6 +66,12 @@ fun DashBoard(userName: String, accountNumber: String, balance: String ,    navC
 ,    token: String
 ) {
 
+    val userViewModel: UserViewModel = hiltViewModel()
+
+    LaunchedEffect(Unit) {
+        userViewModel.refreshBalance(accountNumber)
+    }
+
     val viewmodel: TransferViewModel = hiltViewModel()
 
     LaunchedEffect(Unit) {
@@ -86,7 +93,7 @@ fun DashBoard(userName: String, accountNumber: String, balance: String ,    navC
 
             Spacer(Modifier.height(10.dp))
 
-            BalanceCard("$${balance}", "Current Balance")
+            BalanceCard("#${userViewModel.balance}", "Current Balance")
 
             Spacer(Modifier.height(15.dp))
 

@@ -29,7 +29,6 @@ class TransferViewModel @Inject constructor(
     var transferResult by mutableStateOf<TransferResponse?>(null)
         private set
 
-    // ✅ Fetch user (already good)
     fun fetchUser(accountNumber: String) {
         viewModelScope.launch {
             try {
@@ -48,7 +47,6 @@ class TransferViewModel @Inject constructor(
         }
     }
 
-    // ADD THIS (THIS IS YOUR MISSING PIECE)
     fun performTransfer(
         accountNumber: String,
         amount: Double,
