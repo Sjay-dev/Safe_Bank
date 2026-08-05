@@ -11,6 +11,7 @@ import com.example.safebank.View.DashBoard.ScaffoldScreen
 import com.example.safebank.View.DashBoard.TransactionReceiptScreen
 import com.example.safebank.View.DashBoard.TransferDetailsScreen
 import com.example.safebank.View.DashBoard.TransferScreen
+import com.example.safebank.View.DashBoard.ExternalTransferScreen
 
 
 @Composable
@@ -38,6 +39,10 @@ fun AppNavHost(navController: NavHostController) {
                     )
                 }
             )
+        }
+
+        composable<ExternalTransferRoute> {
+            ExternalTransferScreen(onBackClick = { navController.popBackStack() })
         }
 
         composable<TransferDetailsRoute> { backStackEntry ->

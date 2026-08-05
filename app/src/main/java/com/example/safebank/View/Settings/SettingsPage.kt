@@ -19,10 +19,15 @@ import androidx.compose.ui.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
+import com.example.safebank.ViewModel.ThemeMode
+import com.example.safebank.ViewModel.ThemeViewModel
 
 @Composable
 fun SettingsScreen() {
-
+    val themeViewModel: ThemeViewModel = hiltViewModel()
+    val selectedTheme by themeViewModel.themeMode.collectAsState()
     var showAppearanceDialog by remember { mutableStateOf(false) }
 
     Box(
@@ -80,6 +85,8 @@ fun SettingsScreen() {
 
     if (showAppearanceDialog) {
         AppearanceDialog(
+            selectedTheme = selectedTheme,
+            onThemeSelected = { themeViewModel.setTheme(it); showAppearanceDialog = false },
             onDismiss = { showAppearanceDialog = false }
         )
     }
@@ -89,6 +96,8 @@ fun SettingsScreen() {
 
 @Composable
 fun AppearanceDialog(
+    selectedTheme: ThemeMode,
+    onThemeSelected: (ThemeMode) -> Unit,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
@@ -99,11 +108,9 @@ fun AppearanceDialog(
         text = {
             Column {
 
-                ThemeOption(title = "System Default")
-
-                ThemeOption(title = "Light Mode")
-
-                ThemeOption(title = "Dark Mode")
+                ThemeOption("Follow system", ThemeMode.SYSTEM, selectedTheme, onThemeSelected)
+                ThemeOption("Light mode", ThemeMode.LIGHT, selectedTheme, onThemeSelected)
+                ThemeOption("Dark mode", ThemeMode.DARK, selectedTheme, onThemeSelected)
             }
         },
         confirmButton = {}
@@ -112,19 +119,22 @@ fun AppearanceDialog(
 
 @Composable
 fun ThemeOption(
-    title: String
+    title: String,
+    mode: ThemeMode,
+    selectedTheme: ThemeMode,
+    onThemeSelected: (ThemeMode) -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { }
+            .clickable { onThemeSelected(mode) }
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
         RadioButton(
-            selected = false,
-            onClick = { }
+            selected = selectedTheme == mode,
+            onClick = { onThemeSelected(mode) }
         )
 
         Spacer(modifier = Modifier.width(8.dp))

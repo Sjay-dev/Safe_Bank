@@ -8,6 +8,10 @@ import com.example.safebank.Model.Entities.TransferRequest
 import com.example.safebank.Model.Entities.TransferResponse
 import com.example.safebank.Model.Entities.UserRequest
 import com.example.safebank.Model.Entities.UserResponse
+import com.example.safebank.Model.Entities.Bank
+import com.example.safebank.Model.Entities.AccountResolution
+import com.example.safebank.Model.Entities.ExternalTransferRequest
+import com.example.safebank.Model.Entities.ExternalTransferResponse
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -40,6 +44,20 @@ interface SafeBankApi {
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 10
     ): TransferHistoryResponse
+
+    @GET("api/banks")
+    suspend fun getBanks(): Response<List<Bank>>
+
+    @GET("api/banks/resolve")
+    suspend fun resolveBankAccount(
+        @Query("accountNumber") accountNumber: String,
+        @Query("bankCode") bankCode: String
+    ): Response<AccountResolution>
+
+    @POST("api/transfers/external")
+    suspend fun performExternalTransfer(
+        @Body request: ExternalTransferRequest
+    ): Response<ExternalTransferResponse>
 
     }
 

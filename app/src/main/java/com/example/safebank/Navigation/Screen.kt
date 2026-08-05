@@ -12,6 +12,9 @@ object SignUpRoute
 object TransferRoute
 
 @Serializable
+object ExternalTransferRoute
+
+@Serializable
 data class TransferDetailsRoute(
     val accountNumber: String,
     val recipientName: String

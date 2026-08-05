@@ -12,6 +12,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,9 +24,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.safebank.Navigation.TransferRoute
+import com.example.safebank.Navigation.ExternalTransferRoute
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun QuickActionsRow(navController: NavController) {
+    val context = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth() ,
@@ -41,12 +46,14 @@ fun QuickActionsRow(navController: NavController) {
 
         QuickActionItem(
             icon = Icons.Default.Receipt,
-            label = "Transfer to Other Banks"
+            label = "Transfer to Other Banks",
+            onClick = { navController.navigate(ExternalTransferRoute) }
         )
 
         QuickActionItem(
             icon = Icons.Default.PhoneAndroid,
-            label = "Pay Bills"
+            label = "Pay Bills",
+            onClick = { Toast.makeText(context, "Feature coming soon.", Toast.LENGTH_SHORT).show() }
         )
     }
 }
@@ -65,7 +72,7 @@ fun QuickActionItem(
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Box(
             modifier = Modifier
@@ -80,7 +87,7 @@ fun QuickActionItem(
                     modifier = Modifier
                         .size(36.dp)
                         .background(
-                            color = Color(0xFFEAF2FF),
+                            color = MaterialTheme.colorScheme.primaryContainer,
                             shape = CircleShape
                         ),
                     contentAlignment = Alignment.Center
@@ -88,7 +95,7 @@ fun QuickActionItem(
                     Icon(
                         imageVector = icon,
                         contentDescription = label,
-                        tint = Color(0xFF2563EB),
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -99,7 +106,7 @@ fun QuickActionItem(
                     text = label,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )

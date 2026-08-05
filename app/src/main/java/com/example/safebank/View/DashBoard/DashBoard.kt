@@ -14,10 +14,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -68,14 +72,17 @@ fun DashBoard(userName: String, accountNumber: String, balance: String ,    navC
 
     val userViewModel: UserViewModel = hiltViewModel()
 
-    LaunchedEffect(Unit) {
-        userViewModel.refreshBalance(accountNumber)
-    }
-
     val viewmodel: TransferViewModel = hiltViewModel()
-
-    LaunchedEffect(Unit) {
-        viewmodel.loadTransactions(token)
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner, accountNumber, token) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                userViewModel.refreshBalance(accountNumber)
+                viewmodel.loadTransactions(token)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     Surface(
