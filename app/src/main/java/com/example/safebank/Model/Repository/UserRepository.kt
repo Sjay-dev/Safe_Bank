@@ -1,5 +1,6 @@
 package com.example.safebank.Model.Repository
 
+import android.util.Log
 import com.example.safebank.Model.Entities.TransferRequest
 import com.example.safebank.Model.Entities.TransferResponse
 import com.example.safebank.Model.Entities.UserResponse
@@ -45,7 +46,11 @@ class UserRepository @Inject constructor(
 
     suspend fun getBanks(): List<Bank> {
         val response = api.getBanks()
-        return response.bodyOrThrow(response.code())
+
+        Log.d("BANKS_HTTP", "Code = ${response.code()}")
+        Log.d("BANKS_HTTP", "Body = ${response.body()}")
+
+        return response.bodyOrThrow(0)
     }
 
     suspend fun resolveBankAccount(accountNumber: String, bankCode: String): AccountResolution {

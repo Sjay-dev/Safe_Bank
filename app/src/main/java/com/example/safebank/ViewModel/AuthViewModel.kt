@@ -42,6 +42,7 @@ class AuthViewModel @Inject constructor(
             uiState = AuthUiState.Loading
             try {
                 val response = repository.loginWithGoogle(idToken)
+                tokenProvider.saveToken(response.token)
                 uiState = AuthUiState.LoginSuccess(response.name, response.accountNumber.toString(), response.balance, response.token)
             } catch (e: Exception) {
                 uiState = AuthUiState.Error(e.message ?: "Google sign-in failed")
@@ -63,5 +64,10 @@ class AuthViewModel @Inject constructor(
 
     fun resetState() {
         uiState = AuthUiState.Idle
+    }
+
+    fun logout() {
+        tokenProvider.clearSession()
+        resetState()
     }
 }

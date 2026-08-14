@@ -23,7 +23,7 @@ fun RecentTransactionsSection(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(6.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background )
     ) {
         Column(
             modifier = Modifier.padding(16.dp)

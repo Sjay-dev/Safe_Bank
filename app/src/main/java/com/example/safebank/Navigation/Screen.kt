@@ -17,7 +17,20 @@ object ExternalTransferRoute
 @Serializable
 data class TransferDetailsRoute(
     val accountNumber: String,
-    val recipientName: String
+    val recipientName: String,
+    val senderAccountNumber: String
+)
+
+@Serializable
+data class TransactionReceiptRoute(
+    val amount: String,
+    val recipientName: String,
+    val recipientBank: String,
+    val recipientAccount: String,
+    val narration: String,
+    val reference: String,
+    val dateTime: String,
+    val status: String
 )
 
 @Serializable

@@ -34,3 +34,14 @@ data class ExternalTransferResponse(
     val status: String? = null,
     val message: String? = null
 )
+
+data class ExternalTransferReceipt(
+    val amount: Double,
+    val recipientName: String,
+    val recipientAccountNumber: String,
+    val recipientBank: String,
+    val narration: String,
+    val reference: String,
+    val dateTime: String,
+    val status: String
+)

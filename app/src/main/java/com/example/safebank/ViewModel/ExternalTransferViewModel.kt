@@ -6,11 +6,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.safebank.Model.Entities.Bank
+import com.example.safebank.Model.Entities.ExternalTransferReceipt
 import com.example.safebank.Model.Repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.Instant
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,7 +27,7 @@ class ExternalTransferViewModel @Inject constructor(
     var isResolving by mutableStateOf(false); private set
     var isSubmitting by mutableStateOf(false); private set
     var error by mutableStateOf<String?>(null); private set
-    var successMessage by mutableStateOf<String?>(null); private set
+    var receipt by mutableStateOf<ExternalTransferReceipt?>(null); private set
 
     private var resolutionJob: Job? = null
 
@@ -33,7 +35,7 @@ class ExternalTransferViewModel @Inject constructor(
         if (banks.isNotEmpty() || isLoadingBanks) return@launch
         isLoadingBanks = true
         error = null
-        runCatching { repository.getBanks().filter { it.active } }
+        runCatching { repository.getBanks() }
             .onSuccess { banks = it.sortedBy(Bank::name) }
             .onFailure { error = it.message ?: "Unable to load banks" }
         isLoadingBanks = false
@@ -85,11 +87,26 @@ class ExternalTransferViewModel @Inject constructor(
         if (recipientName == null || isSafeBankAccount) return@launch
         isSubmitting = true
         error = null
-        successMessage = null
+        receipt = null
         runCatching { repository.performExternalTransfer(accountNumber, bank.code, amount, narration) }
-            .onSuccess { successMessage = it.message ?: "Transfer submitted successfully" }
+            .onSuccess { response ->
+                receipt = ExternalTransferReceipt(
+                    amount = amount,
+                    recipientName = recipientName.orEmpty(),
+                    recipientAccountNumber = accountNumber,
+                    recipientBank = bank.name,
+                    narration = narration,
+                    reference = response.reference.orEmpty(),
+                    dateTime = Instant.now().toString(),
+                    status = response.status ?: "Successful"
+                )
+            }
             .onFailure { error = it.message ?: "Transfer failed" }
         isSubmitting = false
+    }
+
+    fun consumeReceipt() {
+        receipt = null
     }
 
     companion object { private const val ACCOUNT_NUMBER_LENGTH = 10 }

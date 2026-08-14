@@ -47,6 +47,11 @@ class TransferViewModel @Inject constructor(
         }
     }
 
+    fun resetRecipient() {
+        recipientName = null
+        error = null
+    }
+
     fun performTransfer(
         accountNumber: String,
         amount: Double,
@@ -69,6 +74,10 @@ class TransferViewModel @Inject constructor(
                 isLoading = false
             }
         }
+    }
+
+    fun consumeTransferResult() {
+        transferResult = null
     }
 
     var transactions by mutableStateOf<List<TransferResponse>>(emptyList())

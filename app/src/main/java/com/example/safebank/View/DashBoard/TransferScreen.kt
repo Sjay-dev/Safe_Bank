@@ -112,8 +112,7 @@ fun TransferScreen(
                                 viewModel.fetchUser(it)
                             } else {
                                 // Reset state if user edits again
-                                viewModel.recipientName
-                                viewModel.error
+                                viewModel.resetRecipient()
                             }
                         },
                         placeholder = { Text("Enter account number") },
@@ -132,7 +131,7 @@ fun TransferScreen(
                         recipientName != null -> {
                             Text(
                                 text = recipientName,
-                                color = Color(0xFF2E7D32), // nicer green
+                                color = Color(0xFF2E7D32),
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -159,7 +158,7 @@ fun TransferScreen(
         // Bottom Button
         Button(
             onClick = { onTransferClick(accountNumber , recipientName!!) },
-            enabled = accountNumber.length == 10 && recipientName != null, // ✅ safer
+            enabled = accountNumber.length == 10 && recipientName != null,
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .align(Alignment.BottomCenter)

@@ -50,8 +50,8 @@ interface SafeBankApi {
 
     @GET("api/banks/resolve")
     suspend fun resolveBankAccount(
-        @Query("accountNumber") accountNumber: String,
-        @Query("bankCode") bankCode: String
+        @Query("account_number") accountNumber: String,
+        @Query("bank_code") bankCode: String
     ): Response<AccountResolution>
 
     @POST("api/transfers/external")

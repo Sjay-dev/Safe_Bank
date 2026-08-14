@@ -24,7 +24,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,6 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.safebank.View.Components.SuggestionChip
+import com.example.safebank.Navigation.TransactionReceiptRoute
 import com.example.safebank.ViewModel.TransferViewModel
 import com.example.safebank.ViewModel.UserViewModel
 
@@ -65,14 +66,18 @@ fun TransferDetailsScreen(
          userViewModel.refreshBalance(senderAccountNumber)
 
             navController.navigate(
-                "receipt/" +
-                        "${result.amount}/" +
-                        "${result.receiverName}/" +
-                        "${result.receiverAccountNumber}/" +
-                        "$name/" +
-                        "${result.senderAccountNumber}/" +
-                        "${result.createdAt}"
+                TransactionReceiptRoute(
+                    amount = result.amount.toString(),
+                    recipientName = result.receiverName,
+                    recipientBank = "SafeBank",
+                    recipientAccount = result.receiverAccountNumber,
+                    narration = result.description,
+                    reference = result.transferId.toString(),
+                    dateTime = result.createdAt,
+                    status = result.status
+                )
             )
+            viewModel.consumeTransferResult()
         }
     }
 
@@ -174,7 +179,7 @@ fun TransferDetailsScreen(
                     Row {
                         SuggestionChip("Purchase") { remark = "Purchase" }
                         Spacer(Modifier.width(8.dp))
-                        SuggestionChip("Personal") { remark = "Personal" }
+                        SuggestionChip("Personal Transfer") { remark = "Personal Transfer" }
                     }
                 }
             }
@@ -206,12 +211,4 @@ fun TransferDetailsScreen(
 
 
 
-@Composable
-fun SuggestionChip(text: String, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier.clickable { onClick() },
-        shape = RoundedCornerShape(20.dp)
-    ) {
-        Text(text, modifier = Modifier.padding(10.dp))
-    }
-}
+

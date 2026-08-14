@@ -5,11 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,11 +21,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
+import androidx.navigation.NavHostController
+import com.example.safebank.Navigation.LoginRoute
+import com.example.safebank.ViewModel.AuthViewModel
 import com.example.safebank.ViewModel.ThemeMode
 import com.example.safebank.ViewModel.ThemeViewModel
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    navController: NavHostController,
+    authViewModel: AuthViewModel = hiltViewModel()
+) {
     val themeViewModel: ThemeViewModel = hiltViewModel()
     val selectedTheme by themeViewModel.themeMode.collectAsState()
     var showAppearanceDialog by remember { mutableStateOf(false) }
@@ -70,15 +76,26 @@ fun SettingsScreen() {
         }
 
         // Logout Button (Bottom)
-        TextButton(
-            onClick = { /* TODO Logout */ },
+        Button(
+            onClick = {
+                authViewModel.logout()
+                navController.navigate(LoginRoute) {
+                    popUpTo(0) { inclusive = true }
+                }
+            },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.error
+            ),
+            shape = RoundedCornerShape(12.dp)
         ) {
             Text(
-                text = "Logout",
-                color = MaterialTheme.colorScheme.error
+                text = "Log out",
+                fontWeight = FontWeight.Bold
             )
         }
     }

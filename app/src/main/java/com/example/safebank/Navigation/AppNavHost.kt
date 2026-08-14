@@ -1,6 +1,8 @@
 package com.example.safebank.Navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -12,6 +14,8 @@ import com.example.safebank.View.DashBoard.TransactionReceiptScreen
 import com.example.safebank.View.DashBoard.TransferDetailsScreen
 import com.example.safebank.View.DashBoard.TransferScreen
 import com.example.safebank.View.DashBoard.ExternalTransferScreen
+import com.example.safebank.ViewModel.TransferViewModel
+import com.example.safebank.ViewModel.UserViewModel
 
 
 @Composable
@@ -27,22 +31,51 @@ fun AppNavHost(navController: NavHostController) {
             SignUpScreen(navController)
         }
 
-        composable<TransferRoute> {
+        composable<TransferRoute> { backStackEntry ->
+            val mainRoute = remember(backStackEntry) {
+                navController.getBackStackEntry<MainRoute>().toRoute<MainRoute>()
+            }
             TransferScreen(
                 onBackClick = { navController.popBackStack() },
                 onTransferClick = { accountNumber, recipientName ->
                     navController.navigate(
                         TransferDetailsRoute(
                             accountNumber = accountNumber,
-                            recipientName = recipientName
+                            recipientName = recipientName,
+                            senderAccountNumber = mainRoute.accountNumber
                         )
                     )
                 }
             )
         }
 
-        composable<ExternalTransferRoute> {
-            ExternalTransferScreen(onBackClick = { navController.popBackStack() })
+        composable<ExternalTransferRoute> { backStackEntry ->
+            val mainBackStackEntry = remember(backStackEntry) {
+                navController.getBackStackEntry<MainRoute>()
+            }
+            val mainRoute = mainBackStackEntry.toRoute<MainRoute>()
+            val userViewModel: UserViewModel = hiltViewModel(mainBackStackEntry)
+            val transferViewModel: TransferViewModel = hiltViewModel(mainBackStackEntry)
+
+            ExternalTransferScreen(
+                onBackClick = { navController.popBackStack() },
+                onTransferSuccess = { receipt ->
+                    userViewModel.refreshBalance(mainRoute.accountNumber)
+                    transferViewModel.loadTransactions(mainRoute.token)
+                    navController.navigate(
+                        TransactionReceiptRoute(
+                            amount = receipt.amount.toString(),
+                            recipientName = receipt.recipientName,
+                            recipientBank = receipt.recipientBank,
+                            recipientAccount = receipt.recipientAccountNumber,
+                            narration = receipt.narration,
+                            reference = receipt.reference,
+                            dateTime = receipt.dateTime,
+                            status = receipt.status
+                        )
+                    )
+                }
+            )
         }
 
         composable<TransferDetailsRoute> { backStackEntry ->
@@ -53,20 +86,22 @@ fun AppNavHost(navController: NavHostController) {
                 name = route.recipientName,
                 navController = navController,
                 onBackClick = { navController.popBackStack() },
-                senderAccountNumber = route.accountNumber
+                senderAccountNumber = route.senderAccountNumber
             )
         }
 
-        composable(
-            "receipt/{amount}/{receiverName}/{receiverAccount}/{senderName}/{senderAccount}/{date}"
-        ) {
-
+        composable<TransactionReceiptRoute> { backStackEntry ->
+            val route: TransactionReceiptRoute = backStackEntry.toRoute()
             TransactionReceiptScreen(
                 navController = navController,
-                amount = it.arguments?.getString("amount") ?: "",
-                recipientName = it.arguments?.getString("receiverName") ?: "",
-                recipientAccount = it.arguments?.getString("receiverAccount") ?: "",
-                dateTime = it.arguments?.getString("date") ?: ""
+                amount = route.amount.toDoubleOrNull() ?: 0.0,
+                recipientName = route.recipientName,
+                recipientBank = route.recipientBank,
+                recipientAccount = route.recipientAccount,
+                narration = route.narration,
+                reference = route.reference,
+                dateTime = route.dateTime,
+                status = route.status
             )
         }
 

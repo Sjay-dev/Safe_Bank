@@ -18,6 +18,12 @@ class TokenProvider @Inject constructor(
     fun saveToken(token: String) {
         val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
         prefs.edit().putString("token", token).apply()
+    }
 
+    fun clearSession() {
+        context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+            .edit()
+            .clear()
+            .apply()
     }
 }

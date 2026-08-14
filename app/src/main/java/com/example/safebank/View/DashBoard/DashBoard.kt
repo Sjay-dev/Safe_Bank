@@ -43,6 +43,8 @@ fun ScaffoldScreen(
     token : String
 ) {
     val bottomNavController = rememberNavController()
+    val userViewModel: UserViewModel = hiltViewModel()
+    val transferViewModel: TransferViewModel = hiltViewModel()
 
     Scaffold(
         bottomBar = {
@@ -55,30 +57,40 @@ fun ScaffoldScreen(
             modifier = Modifier.padding(paddingValues)
         ) {
             composable(BottomScreen.Home.route) {
-                DashBoard(name, accountNumber, balance , navController , token)
+                DashBoard(
+                    userName = name,
+                    accountNumber = accountNumber,
+                    balance = balance,
+                    navController = navController,
+                    token = token,
+                    userViewModel = userViewModel,
+                    transferViewModel = transferViewModel
+                )
             }
 
             composable(BottomScreen.Settings.route) {
-                SettingsScreen()
+                SettingsScreen(navController = navController)
             }
         }
     }
 }
 
 @Composable
-fun DashBoard(userName: String, accountNumber: String, balance: String ,    navController: NavController
-,    token: String
+fun DashBoard(
+    userName: String,
+    accountNumber: String,
+    balance: String,
+    navController: NavController,
+    token: String,
+    userViewModel: UserViewModel,
+    transferViewModel: TransferViewModel
 ) {
-
-    val userViewModel: UserViewModel = hiltViewModel()
-
-    val viewmodel: TransferViewModel = hiltViewModel()
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner, accountNumber, token) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 userViewModel.refreshBalance(accountNumber)
-                viewmodel.loadTransactions(token)
+                transferViewModel.loadTransactions(token)
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -108,7 +120,7 @@ fun DashBoard(userName: String, accountNumber: String, balance: String ,    navC
 
             Spacer(Modifier.height(15.dp))
 
-            RecentTransactionsSection(viewmodel.transactions)
+            RecentTransactionsSection(transferViewModel.transactions)
         }
     }
 }
