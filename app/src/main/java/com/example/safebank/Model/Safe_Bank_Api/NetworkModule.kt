@@ -43,7 +43,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080/")
+            .baseUrl("https://safebank-internal-transfer.onrender.com/")
             .client(client) //  CLIENT WITH INTERCEPTOR
             .addConverterFactory(GsonConverterFactory.create())
             .build()

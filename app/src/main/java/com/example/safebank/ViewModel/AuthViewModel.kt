@@ -26,14 +26,18 @@ class AuthViewModel @Inject constructor(
             try {
                 val response = repository.login(email, password)
 
-
                 tokenProvider.saveToken(response.token)
 
 
+
+
                 uiState = AuthUiState.LoginSuccess(response.name, response.accountNumber.toString(), response.balance, response.token)
-            } catch (e: Exception) {
+            }
+
+            catch (e: Exception) {
                 uiState = AuthUiState.Error("Login failed")
             }
+
         }
     }
 
@@ -43,6 +47,8 @@ class AuthViewModel @Inject constructor(
             try {
                 val response = repository.loginWithGoogle(idToken)
                 tokenProvider.saveToken(response.token)
+
+
                 uiState = AuthUiState.LoginSuccess(response.name, response.accountNumber.toString(), response.balance, response.token)
             } catch (e: Exception) {
                 uiState = AuthUiState.Error(e.message ?: "Google sign-in failed")

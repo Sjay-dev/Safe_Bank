@@ -40,7 +40,7 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun getTransferHistory(token: String): List<TransferResponse> {
-        val response = api.getTransferHistory("Bearer $token")
+        val response = api.getTransferHistory()
         return response.content
     }
 
@@ -77,7 +77,7 @@ class UserRepository @Inject constructor(
     }
 
     suspend fun getTransactionWithNames(token: String): List<TransactionUI> {
-        val transactions = api.getTransferHistory("Bearer $token").content
+        val transactions = api.getTransferHistory().content
 
         return transactions.map { transaction ->
 

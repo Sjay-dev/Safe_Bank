@@ -40,7 +40,6 @@ interface SafeBankApi {
 
     @GET("api/transfers/history")
     suspend fun getTransferHistory(
-        @Header("Authorization") token: String,
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 10
     ): TransferHistoryResponse
